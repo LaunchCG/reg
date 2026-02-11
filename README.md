@@ -39,7 +39,7 @@ A dex package registry hosted on Azure Blob Storage. Contains development packag
 |---------|-------------|--------------|
 | `frontend-qa` | QA toolkit, Playwright E2E testing | typescript, base-dev |
 | `docker-compose` | Docker Compose orchestration | — |
-| `github-workflows` | GitHub PR/issue automation | base-dev |
+| `github-workflows` | GitHub PR/issue automation | base-dev, sdlc-stories |
 
 ## Install Packages
 

@@ -103,7 +103,7 @@ base-dev (foundation)
 │   ├── sdlc-architecture
 │   └── sdlc-reviewer (+ code-review)
 ├── frontend-qa (+ typescript)
-└── github-workflows
+└── github-workflows (+ sdlc-stories)
 
 typescript (standalone)
 ├── nextjs

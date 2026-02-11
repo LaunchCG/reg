@@ -6,7 +6,11 @@ package {
 }
 
 dependency "base-dev" {
-  version = ">=0.1.0"  # For commit standards
+  version = ">=0.1.0"
+}
+
+dependency "sdlc-stories" {
+  version = ">=0.1.0"
 }
 
 # GitHub MCP server (moved from base-dev@0.3.1)
@@ -31,11 +35,6 @@ claude_settings "mcp-permissions" {
 claude_skill "pr-writing" {
   description = "Create high-quality pull requests with structured descriptions"
   content     = file("skills/pr-writing.md")
-}
-
-claude_skill "issue-writing" {
-  description = "Create well-structured GitHub issues with clear descriptions"
-  content     = file("skills/issue-writing.md")
 }
 
 claude_skill "github-operations" {
@@ -79,11 +78,6 @@ claude_rule "github-issues" {
 copilot_skill "pr-writing" {
   description = "Create high-quality pull requests with structured descriptions"
   content     = file("skills/pr-writing.md")
-}
-
-copilot_skill "issue-writing" {
-  description = "Create well-structured GitHub issues with clear descriptions"
-  content     = file("skills/issue-writing.md")
 }
 
 copilot_skill "github-operations" {
