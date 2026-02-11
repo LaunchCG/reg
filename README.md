@@ -2,6 +2,8 @@
 
 A dex package registry hosted on Azure Blob Storage. Contains development packages for AI-augmented SDLC workflows, code quality, and framework-specific tooling.
 
+**Registry URL:** https://nexustemplateproduction.z13.web.core.windows.net/
+
 ## Packages
 
 ### Foundation
@@ -86,6 +88,14 @@ dex install sdlc-code@0.1.0 -r nexus-template --save
 ./deploy.sh --clean
 ```
 
+### Check Infrastructure Status
+
+```bash
+./infrastructure/status.sh
+```
+
+Shows the current state of the registry: Azure account, resource group, storage account, static website config, live package list, and local config sync status.
+
 ### Infrastructure Only
 
 ```bash
@@ -141,7 +151,8 @@ nexus-template/
 ├── infrastructure/
 │   ├── main.bicep              # Azure Blob Storage
 │   ├── parameters.json         # Bicep parameters
-│   └── deploy.sh               # Infra deploy script
+│   ├── deploy.sh               # Infra deploy script
+│   └── status.sh               # Check provisioned infrastructure
 ├── scripts/
 │   ├── package.sh              # Build all packages
 │   ├── generate-registry.py    # Generate registry.json
