@@ -1,0 +1,43 @@
+version: "1.0"
+
+tasks:
+  deploy-infra:
+    description: Deploy Azure infrastructure (Blob Storage + Bicep)
+    command: ./infrastructure/deploy.sh
+    working_directory: "."
+
+  package:
+    description: Package all dex plugins into tarballs and generate registry.json
+    command: ./scripts/package.sh
+    working_directory: "."
+
+  deploy:
+    description: Package and deploy all plugins to Azure registry
+    command: ./deploy.sh
+    working_directory: "."
+
+  deploy-clean:
+    description: Clean build and deploy all plugins to Azure registry
+    command: ./deploy.sh --clean
+    working_directory: "."
+
+  deploy-all:
+    description: Deploy infrastructure and all plugins
+    command: ./deploy.sh --infra
+    working_directory: "."
+
+  verify-registry:
+    description: Check registry.json contents on Azure
+    command: |
+      source infrastructure/config.sh
+      curl -s "$REGISTRY_URL/registry.json" | python3 -m json.tool
+    working_directory: "."
+    shell: bash
+
+  list-packages:
+    description: List all packages in the registry
+    command: |
+      source infrastructure/config.sh
+      curl -s "$REGISTRY_URL/registry.json" | python3 -c "import sys,json; [print(k) for k in json.load(sys.stdin)['packages']]"
+    working_directory: "."
+    shell: bash

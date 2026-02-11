@@ -1,0 +1,12 @@
+# Build artifacts
+build/
+
+# Infrastructure generated files
+infrastructure/config.sh
+
+# Package artifacts
+*.tar.gz
+
+# Dex managed
+.dex/
+dex.lock

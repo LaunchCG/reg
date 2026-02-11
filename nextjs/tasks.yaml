@@ -1,0 +1,190 @@
+version: "1.0"
+
+tasks:
+  # Development
+  next-dev:
+    description: "Start Next.js development server"
+    expose_working_directory: true
+    command: "npx next dev {{if .port}}-p {{.port}}{{end}}"
+    type: oneshot
+    parameters:
+      port:
+        type: string
+        required: false
+        description: "Port number (default: 3000)"
+
+  # Build & Production
+  next-build:
+    description: "Build Next.js application for production"
+    expose_working_directory: true
+    command: "npx next build"
+    type: oneshot
+
+  next-start:
+    description: "Start Next.js production server"
+    expose_working_directory: true
+    command: "npx next start {{if .port}}-p {{.port}}{{end}}"
+    type: oneshot
+    parameters:
+      port:
+        type: string
+        required: false
+        description: "Port number (default: 3000)"
+
+  next-analyze:
+    description: "Analyze Next.js bundle size"
+    expose_working_directory: true
+    command: "ANALYZE=true npx next build"
+    type: oneshot
+
+  # Code Quality
+  next-lint:
+    description: "Run Next.js ESLint"
+    expose_working_directory: true
+    command: "npx next lint {{if .args}}{{.args}}{{end}}"
+    type: oneshot
+    parameters:
+      args:
+        type: string
+        required: false
+        description: "Additional arguments for next lint"
+
+  next-lint-fix:
+    description: "Run Next.js ESLint with auto-fix"
+    expose_working_directory: true
+    command: "npx next lint --fix"
+    type: oneshot
+
+  type-check:
+    description: "Run TypeScript type checking"
+    expose_working_directory: true
+    command: "npx tsc --noEmit"
+    type: oneshot
+
+  format:
+    description: "Format code with Prettier"
+    expose_working_directory: true
+    command: "npx prettier --write ."
+    type: oneshot
+
+  format-check:
+    description: "Check code formatting with Prettier"
+    expose_working_directory: true
+    command: "npx prettier --check ."
+    type: oneshot
+
+  validate:
+    description: "Run full validation (type-check, lint, test)"
+    expose_working_directory: true
+    command: "npx tsc --noEmit && npx next lint && npm test"
+    type: oneshot
+
+  # Testing
+  test:
+    description: "Run all tests"
+    expose_working_directory: true
+    command: "npx vitest run"
+    type: oneshot
+
+  test-watch:
+    description: "Run tests in watch mode"
+    expose_working_directory: true
+    command: "npx vitest"
+    type: oneshot
+
+  test-ui:
+    description: "Run tests with UI"
+    expose_working_directory: true
+    command: "npx vitest --ui"
+    type: oneshot
+
+  test-coverage:
+    description: "Run tests with coverage report"
+    expose_working_directory: true
+    command: "npx vitest run --coverage"
+    type: oneshot
+
+  test-e2e:
+    description: "Run E2E tests with Playwright"
+    command: "npx playwright test"
+    type: oneshot
+
+  test-e2e-ui:
+    description: "Run E2E tests with Playwright UI"
+    command: "npx playwright test --ui"
+    type: oneshot
+
+  # Database (Prisma)
+  db-generate:
+    description: "Generate Prisma client"
+    expose_working_directory: true
+    command: "npx prisma generate"
+    type: oneshot
+
+  db-migrate:
+    description: "Run database migrations"
+    expose_working_directory: true
+    command: "npx prisma migrate dev {{if .name}}--name {{.name}}{{end}}"
+    type: oneshot
+    parameters:
+      name:
+        type: string
+        required: false
+        description: "Migration name"
+
+  db-migrate-deploy:
+    description: "Deploy pending migrations to database"
+    expose_working_directory: true
+    command: "npx prisma migrate deploy"
+    type: oneshot
+
+  db-push:
+    description: "Push schema changes to database (skip migrations)"
+    expose_working_directory: true
+    command: "npx prisma db push"
+    type: oneshot
+
+  db-seed:
+    description: "Seed the database"
+    expose_working_directory: true
+    command: "npx prisma db seed"
+    type: oneshot
+
+  db-studio:
+    description: "Open Prisma Studio"
+    expose_working_directory: true
+    command: "npx prisma studio"
+    type: oneshot
+
+  db-reset:
+    description: "Reset database (WARNING: destroys all data)"
+    expose_working_directory: true
+    command: "npx prisma migrate reset"
+    type: oneshot
+
+  # Environment
+  generate-env:
+    description: "Generate .env.local from .env.example"
+    expose_working_directory: true
+    command: "cp .env.example .env.local"
+    type: oneshot
+
+  # Deployment
+  build-analyze:
+    description: "Build and analyze bundle"
+    expose_working_directory: true
+    command: "ANALYZE=true npm run build"
+    type: oneshot
+
+  # Clean
+  clean:
+    description: "Clean build artifacts and dependencies"
+    expose_working_directory: true
+    command: "rm -rf .next node_modules && npm install"
+    type: oneshot
+
+  clean-cache:
+    description: "Clean Next.js cache"
+    expose_working_directory: true
+    command: "rm -rf .next/cache"
+    type: oneshot

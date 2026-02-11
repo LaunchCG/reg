@@ -1,0 +1,89 @@
+version: "1.0"
+
+tasks:
+  vite-dev:
+    description: "Start Vite development server"
+    expose_working_directory: true
+    command: "npx vite {{if .port}}--port {{.port}}{{end}} {{if .host}}--host {{.host}}{{end}} {{if .open}}--open{{end}} {{.args}}"
+    type: daemon
+    parameters:
+      port:
+        type: string
+        required: false
+        default: ""
+        description: "Port number (default: 5173)"
+      host:
+        type: string
+        required: false
+        default: ""
+        description: "Host address (e.g., 0.0.0.0 for network access)"
+      open:
+        type: boolean
+        required: false
+        default: ""
+        description: "Open browser on server start"
+      args:
+        type: string
+        required: false
+        default: ""
+        description: "Additional arguments (e.g., '--cors --force')"
+
+  vite-build:
+    description: "Build Vite application for production"
+    expose_working_directory: true
+    command: "npx vite build {{if .mode}}--mode {{.mode}}{{end}} {{if .outDir}}--outDir {{.outDir}}{{end}} {{if .sourcemap}}--sourcemap {{.sourcemap}}{{end}} {{.args}}"
+    type: oneshot
+    parameters:
+      mode:
+        type: string
+        required: false
+        default: ""
+        description: "Build mode (e.g., production, staging)"
+      outDir:
+        type: string
+        required: false
+        default: ""
+        description: "Output directory (default: dist)"
+      sourcemap:
+        type: string
+        required: false
+        default: ""
+        description: "Generate sourcemap (true, false, inline, hidden)"
+      args:
+        type: string
+        required: false
+        default: ""
+        description: "Additional arguments (e.g., '--minify false')"
+
+  vite-preview:
+    description: "Preview production build locally"
+    expose_working_directory: true
+    command: "npx vite preview {{if .port}}--port {{.port}}{{end}} {{if .host}}--host {{.host}}{{end}} {{if .open}}--open{{end}} {{.args}}"
+    type: daemon
+    parameters:
+      port:
+        type: string
+        required: false
+        default: ""
+        description: "Port number (default: 4173)"
+      host:
+        type: string
+        required: false
+        default: ""
+        description: "Host address (e.g., 0.0.0.0 for network access)"
+      open:
+        type: boolean
+        required: false
+        default: ""
+        description: "Open browser on server start"
+      args:
+        type: string
+        required: false
+        default: ""
+        description: "Additional arguments"
+
+  type-check:
+    description: "Run TypeScript type checking"
+    expose_working_directory: true
+    command: "npx tsc --noEmit"
+    type: oneshot

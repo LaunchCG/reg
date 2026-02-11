@@ -1,0 +1,61 @@
+version: "1.0"
+
+tasks:
+  list-containers:
+    description: "List Docker Compose containers"
+    expose_working_directory: true
+    command: "docker-compose ps"
+    type: oneshot
+
+  view-logs:
+    description: "View logs for a Docker Compose service"
+    expose_working_directory: true
+    command: "docker-compose logs --tail {{.lines}} {{.service}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: true
+        description: "Name of the service"
+      lines:
+        type: string
+        required: false
+        default: "all"
+        description: "Number of lines to show (e.g., '100' or 'all')"
+
+  exec-command:
+    description: "Execute command in a Docker Compose service container"
+    expose_working_directory: true
+    command: "docker-compose exec {{.service}} {{.command}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: true
+        description: "Name of the service"
+      command:
+        type: string
+        required: true
+        description: "Command to execute"
+
+  restart-service:
+    description: "Restart a Docker Compose service"
+    expose_working_directory: true
+    command: "docker-compose restart {{.service}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: true
+        description: "Name of the service"
+
+  rebuild-service:
+    description: "Rebuild and restart a service"
+    expose_working_directory: true
+    command: "docker-compose up -d --build {{.service}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: true
+        description: "Name of the service"

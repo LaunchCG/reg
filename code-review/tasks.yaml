@@ -1,0 +1,75 @@
+version: "1.0"
+
+tasks:
+  git_cmd:
+    description: "Execute git command with custom arguments"
+    expose_working_directory: true
+    command: "git {{.args}}"
+    type: oneshot
+    parameters:
+      args:
+        type: string
+        required: true
+        description: "Git command and arguments (e.g., 'diff HEAD~1', 'show --stat', 'log --oneline -10')"
+
+  analyze-module-size:
+    description: "Analyze module sizes across languages to identify large files"
+    expose_working_directory: true
+    command: |
+      find . -type f \( \
+        -name '*.py' -o \
+        -name '*.js' -o \
+        -name '*.ts' -o \
+        -name '*.tsx' -o \
+        -name '*.jsx' -o \
+        -name '*.go' -o \
+        -name '*.rs' -o \
+        -name '*.java' -o \
+        -name '*.rb' -o \
+        -name '*.php' -o \
+        -name '*.c' -o \
+        -name '*.cpp' -o \
+        -name '*.h' -o \
+        -name '*.hpp' \
+      \) -exec wc -l {} + | sort -rn | head -n {{.limit}}
+    type: oneshot
+    parameters:
+      limit:
+        type: string
+        required: false
+        description: "Number of largest files to display (default: 20)"
+        default: "20"
+
+  detect-languages:
+    description: "Detect programming languages used in the current project"
+    expose_working_directory: true
+    command: |
+      echo "Analyzing project languages..." && \
+      find . -type f -not -path '*/\.*' -not -path '*/node_modules/*' -not -path '*/vendor/*' | \
+      sed -n 's/.*\.\([^.]*\)$/\1/p' | \
+      sort | uniq -c | sort -rn | \
+      awk '{
+        ext=$2;
+        count=$1;
+        lang="Unknown";
+        if (ext == "py") lang="Python";
+        else if (ext == "js") lang="JavaScript";
+        else if (ext == "ts") lang="TypeScript";
+        else if (ext == "tsx" || ext == "jsx") lang="React";
+        else if (ext == "go") lang="Go";
+        else if (ext == "rs") lang="Rust";
+        else if (ext == "java") lang="Java";
+        else if (ext == "rb") lang="Ruby";
+        else if (ext == "php") lang="PHP";
+        else if (ext == "c" || ext == "h") lang="C";
+        else if (ext == "cpp" || ext == "hpp" || ext == "cc") lang="C++";
+        else if (ext == "sh") lang="Shell";
+        else if (ext == "md") lang="Markdown";
+        else if (ext == "json") lang="JSON";
+        else if (ext == "yaml" || ext == "yml") lang="YAML";
+        else if (ext == "html") lang="HTML";
+        else if (ext == "css") lang="CSS";
+        else if (ext == "sql") lang="SQL";
+        printf "%-15s %5d files\n", lang, count;
+      }'
+    type: oneshot
