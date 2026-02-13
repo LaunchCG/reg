@@ -65,6 +65,11 @@ echo "==> Restoring existing registry for version merge..."
 cp /tmp/registry-existing.json build/registry-existing.json
 echo
 
+# Generate packages metadata
+echo "==> Generating packages-meta.json..."
+python3 ./scripts/generate-packages-meta.py
+echo
+
 # Upload to Azure Blob Storage $web container
 echo "==> Uploading to Azure Blob Storage..."
 az storage blob upload-batch \
