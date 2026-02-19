@@ -1,7 +1,7 @@
 version: "1.0"
 
 tasks:
-  git_cmd:
+  cr-git-cmd:
     description: "Execute git command with custom arguments"
     expose_working_directory: true
     command: "git {{.args}}"
@@ -12,7 +12,7 @@ tasks:
         required: true
         description: "Git command and arguments (e.g., 'diff HEAD~1', 'show --stat', 'log --oneline -10')"
 
-  analyze-module-size:
+  cr-analyze-module-size:
     description: "Analyze module sizes across languages to identify large files"
     expose_working_directory: true
     command: |
@@ -40,7 +40,7 @@ tasks:
         description: "Number of largest files to display (default: 20)"
         default: "20"
 
-  detect-languages:
+  cr-detect-languages:
     description: "Detect programming languages used in the current project"
     expose_working_directory: true
     command: |
@@ -73,3 +73,46 @@ tasks:
         printf "%-15s %5d files\n", lang, count;
       }'
     type: oneshot
+
+prompts:
+  cr-start-review:
+    description: "Kick off a comprehensive code review using the code-review and software-engineering skills"
+    content: |
+      You are performing a comprehensive code review. Activate your **code-review** and **software-engineering** skills now — they contain your review methodology, severity classification, universal review dimensions, and output format.
+
+      ## Step 1: Gather Context
+
+      Run these now to understand the change:
+
+      1. {{.Tasks.cr-git-cmd.Run}} with args `diff main...HEAD` — see all changed lines
+      2. {{.Tasks.cr-git-cmd.Run}} with args `log main...HEAD --oneline` — understand commit intent
+      3. {{.Tasks.cr-git-cmd.Run}} with args `diff --stat main...HEAD` — get files changed summary
+      4. {{.Tasks.cr-detect-languages.Run}} — identify languages in scope
+
+      ## Step 2: Size Assessment
+
+      Count lines changed from the diff stat output:
+      - <100 lines → Standard review
+      - 100–500 lines → Thorough review
+      - 500–1000 lines → Extra scrutiny
+      - >1000 lines → Consider requesting a split
+
+      ## Step 3: Execute the Review
+
+      Follow all 6 phases from your **code-review** skill:
+      1. **Context Gathering** — change type, goals, linked issues
+      2. **Language Detection** — map languages to language-specific skills
+      3. **Universal Review** — all 6 dimensions (quality, architecture, module organization, testing, security, performance)
+      4. **Language-Specific Analysis** — invoke language skills (python-style, typescript, etc.) for each language detected
+      5. **Severity Classification** — apply [CRITICAL] / [ERROR] / [WARNING] / [SUGGESTION] per your skill
+      6. **Report Generation** — use the output format template from your skill
+
+      If large files are flagged, run {{.Tasks.cr-analyze-module-size.Run}} to identify oversized modules.
+
+      ## Step 4: Produce the Report
+
+      Output the full Code Review Report using the template in your **code-review** skill. Include:
+      - Summary with file count, line count, change type, and overall assessment
+      - All issues grouped by severity with file:line references and concrete fixes
+      - Test coverage assessment
+      - Clear approval status: **APPROVED** / **APPROVED WITH COMMENTS** / **CHANGES REQUESTED**
