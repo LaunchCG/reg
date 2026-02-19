@@ -45,12 +45,6 @@ tasks:
         required: false
         description: "Arguments for mypy (e.g., '--strict .', '.')"
 
-  py-lint:
-    description: "Run all linting tools in sequence"
-    expose_working_directory: true
-    command: "uvx ruff check . && uvx black --check . && uvx isort --check-only . && uvx mypy ."
-    type: oneshot
-    disable_mcp: true
 
 workflows:
   py-lint-all:
