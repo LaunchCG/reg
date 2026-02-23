@@ -1,6 +1,6 @@
 package {
   name        = "python-dev"
-  version     = "0.2.3"
+  version     = "0.2.4"
   description = "Python development toolkit with style guidelines, type hints, testing patterns, and code quality standards"
   platforms   = ["claude-code", "github-copilot"]
 }
