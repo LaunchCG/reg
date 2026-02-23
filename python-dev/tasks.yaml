@@ -37,7 +37,7 @@ tasks:
   py-mypy:
     description: "Run mypy type checking"
     expose_working_directory: true
-    command: "uvx mypy {{.args}}"
+    command: "uv run mypy {{.args}}"
     type: oneshot
     parameters:
       args:

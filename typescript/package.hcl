@@ -1,6 +1,6 @@
 package {
   name        = "typescript"
-  version     = "0.2.1"
+  version     = "0.2.2"
   description = "TypeScript development toolkit with linting, testing, and E2E validation using Chrome DevTools MCP"
   platforms   = ["claude-code", "github-copilot"]
 }

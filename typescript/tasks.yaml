@@ -4,7 +4,7 @@ tasks:
   ts-test:
     description: "Run Jest tests"
     expose_working_directory: true
-    command: "npx jest {{.args}}"
+    command: "npx --no-install jest {{if .args}}{{.args}}{{end}}"
     type: oneshot
     parameters:
       args:
@@ -15,7 +15,7 @@ tasks:
   ts-test-watch:
     description: "Run Jest in watch mode"
     expose_working_directory: true
-    command: "npx jest --watch {{.args}}"
+    command: "npx --no-install jest --watch {{if .args}}{{.args}}{{end}}"
     type: oneshot
     disable_mcp: true
     parameters:
@@ -27,7 +27,7 @@ tasks:
   ts-test-coverage:
     description: "Run Jest with coverage report"
     expose_working_directory: true
-    command: "npx jest --coverage {{.args}}"
+    command: "npx --no-install jest --coverage {{if .args}}{{.args}}{{end}}"
     type: oneshot
     disable_mcp: true
     parameters:
@@ -39,7 +39,7 @@ tasks:
   ts-lint:
     description: "Run ESLint"
     expose_working_directory: true
-    command: "npx eslint {{.args}}"
+    command: "npx --no-install eslint {{if .args}}{{.args}}{{else}}.{{end}}"
     type: oneshot
     parameters:
       args:
@@ -50,7 +50,7 @@ tasks:
   ts-lint-fix:
     description: "Run ESLint with auto-fix"
     expose_working_directory: true
-    command: "npx eslint --fix {{.args}}"
+    command: "npx --no-install eslint --fix {{if .args}}{{.args}}{{else}}.{{end}}"
     type: oneshot
     parameters:
       args:
@@ -61,7 +61,7 @@ tasks:
   ts-type-check:
     description: "Run TypeScript type checking"
     expose_working_directory: true
-    command: "npx tsc --noEmit {{.args}}"
+    command: "npx --no-install tsc --noEmit {{if .args}}{{.args}}{{end}}"
     type: oneshot
     parameters:
       args:
