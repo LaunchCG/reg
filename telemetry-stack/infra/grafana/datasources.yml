@@ -1,0 +1,38 @@
+# Grafana datasource provisioning — distributed to .telemetry/grafana/datasources.yml
+# Automatically provisions all datasources on Grafana startup
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus-local
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      timeInterval: "15s"
+
+  - name: Loki
+    type: loki
+    uid: loki-local
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 1000
+
+  - name: Elasticsearch
+    type: elasticsearch
+    uid: elasticsearch-local
+    access: proxy
+    url: http://elasticsearch:9200
+    editable: false
+    jsonData:
+      index: "otel-logs"
+      timeField: "@timestamp"
+      esVersion: "8.12.2"
+      logMessageField: "body"
+      logLevelField: "severity"

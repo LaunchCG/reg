@@ -1,0 +1,27 @@
+# Prometheus config — distributed to .telemetry/prometheus.yml
+# Scrapes the OTEL Collector's Prometheus exporter endpoint
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: local
+    cluster: nexus-local
+
+rule_files: []
+
+scrape_configs:
+  # App metrics forwarded through OTEL Collector's Prometheus exporter
+  - job_name: otel-collector-metrics
+    static_configs:
+      - targets: ["otel-collector:8889"]
+
+  # OTEL Collector internal metrics
+  - job_name: otel-collector-self
+    static_configs:
+      - targets: ["otel-collector:8888"]
+
+  # Prometheus self-scrape
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

@@ -1,0 +1,85 @@
+version: "1.0"
+
+tasks:
+  start-stack:
+    description: "Start the local telemetry stack (Prometheus, Grafana, OTEL Collector, Elasticsearch, Loki)"
+    expose_working_directory: true
+    command: "docker compose -f .dex/stacks/telemetry-stack/docker-compose.telemetry.yml up -d"
+    type: oneshot
+
+  stop-stack:
+    description: "Stop and remove the local telemetry stack containers"
+    expose_working_directory: true
+    command: "docker compose -f .dex/stacks/telemetry-stack/docker-compose.telemetry.yml down"
+    type: oneshot
+
+  stack-status:
+    description: "Show status of all telemetry stack containers"
+    expose_working_directory: true
+    command: "docker compose -f .dex/stacks/telemetry-stack/docker-compose.telemetry.yml ps"
+    type: oneshot
+
+  stack-logs:
+    description: "View logs for a telemetry stack service"
+    expose_working_directory: true
+    command: "docker compose -f .dex/stacks/telemetry-stack/docker-compose.telemetry.yml logs --tail {{.lines}} {{.service}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: false
+        default: ""
+        description: "Service name (otel-collector, prometheus, grafana, loki, elasticsearch). Leave empty for all services."
+      lines:
+        type: string
+        required: false
+        default: "100"
+        description: "Number of log lines to show"
+
+  get-grafana-token:
+    description: "Create a Grafana service account token for use with the telemetry-mcp Grafana MCP server"
+    expose_working_directory: true
+    command: |
+      SA_ID=$(curl -sf -X POST http://admin:nexus-local@localhost:3000/api/serviceaccounts \
+        -H 'Content-Type: application/json' \
+        -d "{\"name\":\"mcp-claude-$(date +%s)\",\"role\":\"Viewer\"}" \
+        | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])") && \
+      TOKEN=$(curl -sf -X POST http://admin:nexus-local@localhost:3000/api/serviceaccounts/$SA_ID/tokens \
+        -H 'Content-Type: application/json' \
+        -d "{\"name\":\"token-$(date +%s)\"}" \
+        | python3 -c "import sys,json; print(json.load(sys.stdin)['key'])") && \
+      echo "Set these environment variables before starting Claude Code:" && \
+      echo "  export GRAFANA_URL=http://localhost:3000" && \
+      echo "  export GRAFANA_SERVICE_ACCOUNT_TOKEN=$TOKEN"
+    type: oneshot
+
+  restart-service:
+    description: "Restart a specific telemetry stack service"
+    expose_working_directory: true
+    command: "docker compose -f .dex/stacks/telemetry-stack/docker-compose.telemetry.yml restart {{.service}}"
+    type: oneshot
+    parameters:
+      service:
+        type: string
+        required: true
+        description: "Service to restart: otel-collector, prometheus, grafana, loki, or elasticsearch"
+
+workflows:
+  start-and-verify:
+    description: "Start the telemetry stack and verify all containers are running"
+    steps:
+      - task: start-stack
+      - task: stack-status
+
+prompts:
+  debug-stack:
+    description: "Guide for debugging the local telemetry stack"
+    content: |
+      To debug the local telemetry stack:
+      1. Check container status: {{.Tasks.stack-status.Run}}
+      2. View OTEL Collector logs: {{.Tasks.stack-logs.Run}} with service=otel-collector
+      3. View Prometheus logs: {{.Tasks.stack-logs.Run}} with service=prometheus
+      4. If a service is unhealthy, restart it: {{.Tasks.restart-service.Run}}
+      5. Verify Prometheus scrape targets at http://localhost:9090/targets
+      6. Verify OTEL Collector health at http://localhost:13133
+      7. Verify Grafana datasources at http://localhost:3000/connections/datasources

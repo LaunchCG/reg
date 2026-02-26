@@ -1,0 +1,80 @@
+# OTEL Collector config — distributed to .telemetry/otel-collector.yml
+# Receives OTLP signals and fans out to Prometheus, Loki, and Elasticsearch
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: local
+        action: upsert
+
+exporters:
+  # Metrics → Prometheus
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: otel
+    send_timestamps: true
+    metric_expiration: 5m
+
+  # Logs → Loki
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+    default_labels_enabled:
+      exporter: false
+      job: true
+      instance: true
+      level: true
+
+  # Logs + Traces → Elasticsearch
+  elasticsearch:
+    endpoints: ["http://elasticsearch:9200"]
+    logs_index: otel-logs
+    traces_index: otel-traces
+    retry:
+      enabled: true
+      max_requests: 3
+      initial_interval: 1s
+      max_interval: 30s
+
+  debug:
+    verbosity: basic
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [elasticsearch, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [prometheus, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [loki, elasticsearch, debug]

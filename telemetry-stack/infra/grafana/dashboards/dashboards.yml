@@ -1,0 +1,16 @@
+# Grafana dashboard provisioning config — distributed to .telemetry/grafana/dashboards/dashboards.yml
+
+apiVersion: 1
+
+providers:
+  - name: nexus-local
+    orgId: 1
+    folder: "Nexus Local"
+    folderUid: nexus-local
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false
