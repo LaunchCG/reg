@@ -91,12 +91,12 @@ echo "       Blob Endpoint   : ${BLOB_ENDPOINT}"
 
 # ---- Step 4: Enable static website hosting -----------------------------------
 echo ""
-echo "[4/5] Enabling static website hosting with index document 'registry.json'..."
+echo "[4/5] Enabling static website hosting with index document 'index.html'..."
 
 az storage blob service-properties update \
   --account-name "${STORAGE_ACCOUNT}" \
   --static-website \
-  --index-document "registry.json" \
+  --index-document "index.html" \
   --auth-mode key \
   --output none
 

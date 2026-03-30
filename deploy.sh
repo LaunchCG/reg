@@ -16,19 +16,35 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Deploy infra if requested
 if [ "$DEPLOY_INFRA" = true ]; then
   echo "==> Deploying infrastructure..."
   ./infrastructure/deploy.sh
   echo
+elif [ ! -f infrastructure/config.sh ]; then
+  echo "==> No config.sh found, detecting existing infrastructure..."
+  RESOURCE_GROUP="dex-registry-rg"
+  STORAGE_ACCOUNT=$(az storage account list \
+    --resource-group "$RESOURCE_GROUP" \
+    --query "[0].name" \
+    --output tsv 2>/dev/null || true)
+
+  if [ -n "$STORAGE_ACCOUNT" ]; then
+    echo "    Found existing storage account: $STORAGE_ACCOUNT"
+    REGISTRY_URL="https://${STORAGE_ACCOUNT}.z13.web.core.windows.net"
+    BLOB_ENDPOINT="https://${STORAGE_ACCOUNT}.blob.core.windows.net/"
+    cat > infrastructure/config.sh <<EOF
+export STORAGE_ACCOUNT="${STORAGE_ACCOUNT}"
+export CONTAINER_NAME='\$web'
+export REGISTRY_URL="${REGISTRY_URL}"
+export BLOB_ENDPOINT="${BLOB_ENDPOINT}"
+EOF
+  else
+    echo "    No existing infrastructure found, deploying..."
+    ./infrastructure/deploy.sh
+  fi
+  echo
 fi
 
-# Source config
-if [ ! -f infrastructure/config.sh ]; then
-  echo "Error: infrastructure/config.sh not found"
-  echo "Run with --infra flag first"
-  exit 1
-fi
 source infrastructure/config.sh
 
 # Clean if requested
@@ -38,7 +54,11 @@ if [ "$CLEAN" = true ]; then
   echo
 fi
 
-# Download existing registry.json from Azure to preserve old versions
+# The existing registry.json is downloaded from Azure before packaging because
+# package.sh wipes and recreates build/. Without this, previously published
+# package versions would be lost from the registry on every deploy. The file
+# is stashed in /tmp to survive the build/ wipe, then restored afterward so
+# generate-registry.py can merge old versions with the current build.
 echo "==> Downloading existing registry.json from Azure..."
 mkdir -p build/
 if az storage blob download \
@@ -70,6 +90,10 @@ echo "==> Generating packages-meta.json..."
 python3 ./scripts/generate-packages-meta.py
 echo
 
+echo "==> Copying site files..."
+cp -r site/* build/
+echo
+
 # Upload to Azure Blob Storage $web container
 echo "==> Uploading to Azure Blob Storage..."
 az storage blob upload-batch \
@@ -85,9 +109,9 @@ echo "==> Deployment complete!"
 echo "Registry URL: $REGISTRY_URL"
 echo
 echo "Add to your project's dex.hcl:"
-echo "  registry \"nexus-template\" {"
+echo "  registry \"reg\" {"
 echo "    url = \"$REGISTRY_URL\""
 echo "  }"
 echo
 echo "Then install packages with:"
-echo "  dex install nexus-dev@0.1.0 -r nexus-template --save"
+echo "  dex sync <package-name>"

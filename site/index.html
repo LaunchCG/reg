@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reg - Nexus Package Registry</title>
+  <style>
+    :root {
+      --launch-blue: #013760;
+      --cool-blue: #CDEEFE;
+      --launch-gray: #565A5C;
+      --genuine-gray: #9A9C9D;
+      --card-border: #E2E8F0;
+      --section-alt: #F8FAFC;
+      --font-stack: 'Avenir Next LT Pro', 'Avenir Next', 'Avenir', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-stack);
+      color: var(--launch-gray);
+      background: #fff;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Header */
+    .header {
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4rem;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--launch-blue);
+    }
+    .header-brand svg { width: 2.25rem; height: 2.25rem; }
+    .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+    .header-nav a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--launch-gray);
+      transition: color 0.15s;
+    }
+    .header-nav a:hover { color: var(--launch-blue); }
+    .btn-contact {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background: var(--launch-blue);
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn-contact:hover { opacity: 0.9; }
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--launch-gray);
+    }
+    .mobile-menu {
+      display: none;
+      border-top: 1px solid #e5e7eb;
+      padding: 1rem;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--launch-gray);
+    }
+    .mobile-menu a:hover { color: var(--launch-blue); background: #f9fafb; }
+
+    @media (max-width: 768px) {
+      .header-nav { display: none; }
+      .btn-contact-wrap { display: none; }
+      .mobile-toggle { display: inline-flex; }
+    }
+
+    /* Hero */
+    .hero {
+      padding: 5rem 1rem 5rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 3.75rem);
+      font-weight: 700;
+      color: var(--launch-blue);
+      margin-bottom: 1.5rem;
+      line-height: 1;
+    }
+    .hero p {
+      font-size: 1.125rem;
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+      color: var(--launch-gray);
+    }
+
+    /* Copy command */
+    .copy-cmd {
+      max-width: 48rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .copy-cmd code {
+      flex: 1;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      padding: 0.75rem 1rem;
+      user-select: all;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .copy-cmd button {
+      flex-shrink: 0;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      border-left: 1px solid var(--card-border);
+      color: #64748b;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .copy-cmd button:hover { color: #fff; }
+
+    /* Search */
+    .search-wrap {
+      max-width: 28rem;
+      margin: 0 auto 3rem;
+      position: relative;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--genuine-gray);
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--card-border);
+      font-size: 1rem;
+      font-family: var(--font-stack);
+      color: #000;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-wrap input::placeholder { color: var(--genuine-gray); }
+    .search-wrap input:focus { border-color: var(--launch-blue); }
+
+    /* Grid */
+    .packages-section {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1rem 5rem;
+    }
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) { .pkg-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .pkg-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    /* Card */
+    .card {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-header h4 {
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: #000;
+      line-height: 1.3;
+    }
+    .version-badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      background: var(--cool-blue);
+      color: var(--launch-blue);
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid rgba(1, 55, 96, 0.3);
+    }
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--launch-gray);
+      margin-bottom: 0.75rem;
+      flex: 1;
+    }
+
+    /* Badges */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.75rem; }
+    .platform-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid;
+    }
+    .platform-badge.claude-code {
+      background: var(--cool-blue);
+      color: var(--launch-blue);
+      border-color: rgba(1, 55, 96, 0.3);
+    }
+    .platform-badge.github-copilot {
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803d;
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .platform-badge.cursor {
+      background: rgba(59, 130, 246, 0.15);
+      color: #1d4ed8;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .resource-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      background: #fff;
+      border: 1px solid var(--card-border);
+      font-size: 0.75rem;
+      color: var(--launch-gray);
+    }
+    .deps-text {
+      font-size: 0.75rem;
+      color: var(--genuine-gray);
+      margin-bottom: 0.75rem;
+    }
+    .card-footer {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .card-footer code {
+      font-size: 0.75rem;
+      color: var(--launch-gray);
+      background: var(--section-alt);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      user-select: all;
+    }
+
+    /* Spinner */
+    .spinner-wrap { display: flex; justify-content: center; padding: 5rem 0; }
+    .spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--launch-blue);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-wrap { text-align: center; padding: 3rem 0; }
+    .error-wrap p { color: #dc2626; margin-bottom: 1rem; }
+    .error-wrap button {
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      background: #fff;
+      border: 1px solid var(--card-border);
+      color: var(--launch-gray);
+      cursor: pointer;
+      font-family: var(--font-stack);
+      transition: color 0.15s;
+    }
+    .error-wrap button:hover { color: #000; }
+
+    .empty-msg { color: var(--genuine-gray); text-align: center; padding: 3rem 0; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      margin-top: auto;
+    }
+    .footer-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--launch-blue);
+    }
+    .footer-brand svg { width: 2rem; height: 2rem; }
+    .footer h4 { color: #000; font-weight: 600; margin-bottom: 0.75rem; font-size: 1rem; }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: 0.5rem; }
+    .footer ul a { font-size: 0.875rem; color: var(--launch-gray); }
+    .footer ul a:hover { color: var(--launch-blue); }
+    .footer-bottom {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--genuine-gray);
+    }
+    .footer-bottom a { color: var(--launch-gray); }
+    .footer-bottom a:hover { color: var(--launch-blue); }
+
+    html { min-height: 100%; }
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <h1>reg</h1>
+      <p>The Official Launch Nexus Registry. Browse and install packages for your agentic development harness via dex.</p>
+      <div style="margin-bottom:1.5rem">
+        <span style="display:inline-flex;align-items:center;padding:0.375rem 1rem;border-radius:9999px;border:1px solid var(--card-border);background:var(--section-alt);color:var(--launch-gray);font-size:0.9375rem;font-weight:500">Open Source &middot; MIT License</span>
+      </div>
+      <div class="copy-cmd">
+        <code id="reg-cmd"></code>
+        <button onclick="copyCmd()" title="Copy to clipboard">
+          <svg id="copy-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+          <svg id="check-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" color="#4ade80"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Search + Packages -->
+    <section class="packages-section">
+      <div class="search-wrap">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"/></svg>
+        <input type="text" id="search" placeholder="Search packages..." />
+      </div>
+      <div id="content">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-bottom" style="margin-top:0;padding-top:0;border-top:none;flex-direction:column;justify-content:center;gap:0.5rem">
+        <span style="font-size:0.82rem;color:#8aadca">&copy; <script>document.write(new Date().getFullYear())</script> Launch Consulting &nbsp;&middot;&nbsp; MIT License</span>
+        <span style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:#8aadca">
+          Built by&nbsp;
+          <a href="https://www.launchconsulting.com" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;opacity:0.85;text-decoration:none">
+            <img src="https://cdn.prod.website-files.com/60c924f1b871a7316a4a5bb3/639ce8afc018dd4593394e21_TheWordmark1.svg" alt="Launch Consulting" style="height:36px;width:auto;display:block">
+          </a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const REGISTRY_URL = window.location.protocol === 'file:'
+      ? 'https://regproduction.z13.web.core.windows.net'
+      : window.location.origin;
+    let allPackages = null;
+    let registryData = null;
+
+    // Set the registry add command
+    document.getElementById('reg-cmd').textContent =
+      'dex registry add nexus --url ' + REGISTRY_URL;
+
+    function copyCmd() {
+      const text = document.getElementById('reg-cmd').textContent;
+      navigator.clipboard.writeText(text);
+      document.getElementById('copy-icon').style.display = 'none';
+      document.getElementById('check-icon').style.display = 'inline';
+      setTimeout(() => {
+        document.getElementById('copy-icon').style.display = 'inline';
+        document.getElementById('check-icon').style.display = 'none';
+      }, 2000);
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function platformClass(p) {
+      if (p === 'claude-code') return 'claude-code';
+      if (p === 'github-copilot') return 'github-copilot';
+      if (p === 'cursor') return 'cursor';
+      return '';
+    }
+
+    function resourceBadge(label, count) {
+      if (count === 0) return '';
+      return '<span class="resource-badge">' + count + ' ' + escapeHtml(label) + '</span>';
+    }
+
+    function renderMeta(packages) {
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = packages
+        .filter(p => p.name.toLowerCase().includes(q))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        return '<p class="empty-msg">No packages match your search.</p>';
+      }
+
+      let html = '<div class="pkg-grid">';
+      for (const pkg of filtered) {
+        html += '<div class="card">';
+        html += '<div class="card-header">';
+        html += '<h4>' + escapeHtml(pkg.name) + '</h4>';
+        html += '<span class="version-badge">v' + escapeHtml(pkg.version) + '</span>';
+        html += '</div>';
+        html += '<p class="card-desc">' + escapeHtml(pkg.description || '\u2014') + '</p>';
+
+        if (pkg.platforms && pkg.platforms.length > 0) {
+          html += '<div class="badge-row">';
+          for (const p of pkg.platforms) {
+            html += '<span class="platform-badge ' + platformClass(p) + '">' + escapeHtml(p) + '</span>';
+          }
+          html += '</div>';
+        }
+
+        if (pkg.dependencies && pkg.dependencies.length > 0) {
+          html += '<p class="deps-text">Depends on: ' + pkg.dependencies.map(d => escapeHtml(d.name)).join(', ') + '</p>';
+        }
+
+        if (pkg.resources) {
+          html += '<div class="badge-row">';
+          html += resourceBadge('skills', pkg.resources.skills || 0);
+          html += resourceBadge('rules', pkg.resources.rules || 0);
+          html += resourceBadge('commands', pkg.resources.commands || 0);
+          html += resourceBadge('agents', pkg.resources.subagents || 0);
+          html += resourceBadge('MCP servers', pkg.resources.mcp_servers || 0);
+          html += '</div>';
+        }
+
+        html += '<div class="card-footer"><code>dex sync ' + escapeHtml(pkg.name) + '</code></div>';
+        html += '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function renderRegistry(data) {
+      const q = document.getElementById('search').value.toLowerCase();
+      const entries = Object.entries(data.packages)
+        .filter(([name]) => name.toLowerCase().includes(q))
+        .sort(([a], [b]) => a.localeCompare(b));
+
+      if (entries.length === 0) {
+        return '<p class="empty-msg">No packages match your search.</p>';
+      }
+
+      let html = '<div class="pkg-grid">';
+      for (const [name, info] of entries) {
+        html += '<div class="card">';
+        html += '<div class="card-header">';
+        html += '<h4>' + escapeHtml(name) + '</h4>';
+        html += '<span class="version-badge">v' + escapeHtml(info.latest) + '</span>';
+        html += '</div>';
+        html += '<p class="card-desc">&mdash;</p>';
+        html += '<div class="card-footer"><code>dex sync ' + escapeHtml(name) + '</code></div>';
+        html += '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function render() {
+      const el = document.getElementById('content');
+      if (allPackages) {
+        el.innerHTML = renderMeta(allPackages);
+      } else if (registryData) {
+        el.innerHTML = renderRegistry(registryData);
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', render);
+
+    async function fetchData() {
+      try {
+        const metaRes = await fetch(REGISTRY_URL + '/packages-meta.json');
+        if (metaRes.ok) {
+          const json = await metaRes.json();
+          allPackages = Array.isArray(json) ? json : json.packages;
+          render();
+          return;
+        }
+      } catch { /* fall through */ }
+
+      try {
+        const regRes = await fetch(REGISTRY_URL + '/registry.json');
+        if (regRes.ok) {
+          registryData = await regRes.json();
+          render();
+          return;
+        }
+      } catch { /* both failed */ }
+
+      document.getElementById('content').innerHTML =
+        '<div class="error-wrap"><p>Failed to load registry. Please try again later.</p>' +
+        '<button onclick="location.reload()">Retry</button></div>';
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>

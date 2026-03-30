@@ -32,7 +32,6 @@ for PACKAGE_FILE in $PACKAGE_FILES; do
   (cd "$PACKAGE_DIR" && dex pack -o "$OUTPUT_FILE")
 done
 
-# Restore existing registry before generating new one
 if [ -f /tmp/registry-existing.json ]; then
   echo "Restoring existing registry for version merge..."
   cp /tmp/registry-existing.json "$BUILD_DIR/registry-existing.json"
