@@ -44,9 +44,3 @@ Work must be complete before PR merge:
 - Track quality metrics (test coverage, DoR/DoD compliance)
 - Weekly, monthly, quarterly review cadence
 
-## Getting Started
-
-### Week 1: Foundation - Review methodology, set up agents, define DoR/DoD
-### Week 2-3: Pilot - Select 2-3 stories, use TDD, gather feedback
-### Week 4: Expand - Full team, establish baseline
-### Quarter 1: Mature - Run quarterly assessment, compare to baseline
