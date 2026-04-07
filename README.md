@@ -1,8 +1,8 @@
-# Dex Package Registry (nexus-template)
+# Dex Package Registry
 
 A dex package registry hosted on Azure Blob Storage. Contains development packages for AI-augmented SDLC workflows, code quality, and framework-specific tooling.
 
-**Registry URL:** https://nexustemplateproduction.z13.web.core.windows.net/
+**Registry URL:** https://regproduction.z13.web.core.windows.net/
 
 ## Packages
 
@@ -55,17 +55,17 @@ dex init --agent claude-code
 Add this registry to your project's `dex.hcl`:
 
 ```hcl
-registry "nexus-template" {
-  url = "https://nexustemplateproduction.z13.web.core.windows.net/"
+registry "reg" {
+  url = "https://regproduction.z13.web.core.windows.net/"
 }
 ```
 
 Install packages:
 
 ```bash
-dex install base-dev@0.1.0 -r nexus-template --save
-dex install nexus-dev@0.1.0 -r nexus-template --save
-dex install sdlc-code@0.1.0 -r nexus-template --save
+dex install base-dev@1.0.0 -r reg --save
+dex install nexus-dev@1.0.0 -r reg --save
+dex install sdlc-code@1.0.0 -r reg --save
 ```
 
 ## Deploy the Registry
@@ -153,7 +153,7 @@ The workflow uses [Azure OIDC](https://learn.microsoft.com/en-us/entra/workload-
 ## Project Structure
 
 ```
-nexus-template/
+nexus-registry/
 ├── dex.hcl                     # Project config
 ├── deploy.sh                   # Root deploy script
 ├── infrastructure/
